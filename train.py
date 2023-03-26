@@ -1,6 +1,5 @@
 import os
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import torch.nn as nn
 import bitsandbytes as bnb
@@ -10,14 +9,13 @@ from transformers import AutoTokenizer, AutoConfig, OPTForCausalLM, AutoTokenize
 from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
 
-# optimized for RTX 4090. for larger GPUs, increase some of these?
-BASE_MODEL = "facebook/opt-125m"  # "facebook/opt-6.7b"
+BASE_MODEL = "facebook/opt-6.7b"
 MICRO_BATCH_SIZE = 4  # this could actually be 5 but i like powers of 2
 BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
-EPOCHS = 2  # we don't need 3 tbh
+EPOCHS = 1  # we don't need 3 tbh
 LEARNING_RATE = 3e-4  # the Karpathy constant
-CUTOFF_LEN = 256  # 256 accounts for about 96% of the data
+CUTOFF_LEN = 512 
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
@@ -91,7 +89,7 @@ trainer = transformers.Trainer(
         learning_rate=LEARNING_RATE,
         fp16=True,
         logging_steps=1,
-        output_dir="alpaca-opt",
+        output_dir="alpaca-opt-6.7b",
         save_total_limit=3,
     ),
     data_collator=transformers.DataCollatorForLanguageModeling(tokenizer, mlm=False),
@@ -99,4 +97,4 @@ trainer = transformers.Trainer(
 model.config.use_cache = False
 trainer.train(resume_from_checkpoint=False)
 
-model.save_pretrained("alpaca-opt")
+model.save_pretrained("alpaca-opt-6.7b")

@@ -11,6 +11,7 @@ from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
 
 # optimized for RTX 4090. for larger GPUs, increase some of these?
+BASE_MODEL = "facebook/opt-125m"
 MICRO_BATCH_SIZE = 4  # this could actually be 5 but i like powers of 2
 BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
@@ -24,13 +25,19 @@ LORA_DROPOUT = 0.05
 ## TODO: Download alpaca_data.json here
 
 model = OPTForCausalLM.from_pretrained(
-    "facebook/opt-125m",
+    BASE_MODEL,
     load_in_8bit=True,
     device_map="auto",
 )
-tokenizer = AutoTokenizer.from_pretrained("facebook/opt-125m", add_eos_token=True)
-
 model = prepare_model_for_int8_training(model)
+
+tokenizer = AutoTokenizer.from_pretrained(
+    BASE_MODEL,
+    model_max_length=CUTOFF_LEN,
+    padding_side="right",
+    use_fast=False,
+)
+
 
 config = LoraConfig(
     r=LORA_R,
@@ -41,7 +48,7 @@ config = LoraConfig(
     task_type="CAUSAL_LM",
 )
 model = get_peft_model(model, config)
-tokenizer.pad_token_id = 0  # unk. we want this to be different from the eos token
+
 data = load_dataset("json", data_files="alpaca_data.json")
 
 
@@ -66,9 +73,9 @@ def generate_prompt(data_point):
 data = data.shuffle().map(
     lambda data_point: tokenizer(
         generate_prompt(data_point),
-        truncation=True,
+        padding="longest",
         max_length=CUTOFF_LEN,
-        padding="max_length",
+        truncation=True,
     )
 )
 

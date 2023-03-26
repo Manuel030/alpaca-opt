@@ -91,7 +91,7 @@ trainer = transformers.Trainer(
         learning_rate=LEARNING_RATE,
         fp16=True,
         logging_steps=1,
-        output_dir="alpaca-opt-small",
+        output_dir="alpaca-opt",
         save_total_limit=3,
     ),
     data_collator=transformers.DataCollatorForLanguageModeling(tokenizer, mlm=False),

@@ -11,16 +11,17 @@ from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
 
 # optimized for RTX 4090. for larger GPUs, increase some of these?
-BASE_MODEL = "facebook/opt-125m"
+BASE_MODEL = "facebook/opt-125m"  # "facebook/opt-6.7b"
 MICRO_BATCH_SIZE = 4  # this could actually be 5 but i like powers of 2
 BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
-EPOCHS = 3  # we don't need 3 tbh
+EPOCHS = 2  # we don't need 3 tbh
 LEARNING_RATE = 3e-4  # the Karpathy constant
 CUTOFF_LEN = 256  # 256 accounts for about 96% of the data
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
+DATA_PATH = "alpaca_data.json"
 
 ## TODO: Download alpaca_data.json here
 
@@ -49,7 +50,7 @@ config = LoraConfig(
 )
 model = get_peft_model(model, config)
 
-data = load_dataset("json", data_files="alpaca_data.json")
+data = load_dataset("json", data_files=DATA_PATH)
 
 
 def generate_prompt(data_point):
@@ -90,7 +91,7 @@ trainer = transformers.Trainer(
         learning_rate=LEARNING_RATE,
         fp16=True,
         logging_steps=1,
-        output_dir="lora-alpaca",
+        output_dir="alpaca-opt-small",
         save_total_limit=3,
     ),
     data_collator=transformers.DataCollatorForLanguageModeling(tokenizer, mlm=False),

@@ -40,21 +40,21 @@ def generate_prompt(instruction, input=None):
 model.eval()
 
 
-def evaluate(instruction, input=None, **kwargs):
+def evaluate(instruction, input=None):
     prompt = generate_prompt(instruction, input)
     inputs = tokenizer(prompt, return_tensors="pt")
     input_ids = inputs["input_ids"].cuda()
-    generation_config = GenerationConfig(
-        temperature=0.2,
-        top_p=0.75,
-        **kwargs,
-    )
     generation_output = model.generate(
         input_ids=input_ids,
-        generation_config=generation_config,
         return_dict_in_generate=True,
         output_scores=True,
-        max_new_tokens=256,
+        do_sample=False,
+        max_length= 256,
+        temperature= 0.7,
+        length_penalty=-0.5,
+        top_k= 30,
+        top_p= 0.85,
+        repetition_penalty=1.5
     )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)

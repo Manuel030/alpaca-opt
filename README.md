@@ -6,8 +6,13 @@ from transfomers import Model, tokenizer
 model = Model("manuel030/alpaca-opt-6.7b")
 ```
 
-Why?
+### Why?
 Base model of Standford alpaca doesn't have permissive license. 
 
-Credits
+### Credits
 alpaca-lora
+
+### TODO
+readme
+mixin lora weights
+upload to hf

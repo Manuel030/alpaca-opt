@@ -13,7 +13,7 @@ model = OPTForCausalLM.from_pretrained(
     device_map="auto",
 )
 model = PeftModel.from_pretrained(
-    model, "alpaca-opt/checkpoint-500", torch_dtype=torch.float16
+    model, "alpaca-opt-6.7b", torch_dtype=torch.float16
 )
 
 
@@ -45,7 +45,7 @@ def evaluate(instruction, input=None, **kwargs):
     inputs = tokenizer(prompt, return_tensors="pt")
     input_ids = inputs["input_ids"].cuda()
     generation_config = GenerationConfig(
-        temperature=0.8,
+        temperature=0.2,
         top_p=0.75,
         **kwargs,
     )

@@ -9,26 +9,35 @@ from transformers import AutoTokenizer, AutoConfig, OPTForCausalLM, AutoTokenize
 from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
 
-BASE_MODEL = "facebook/opt-6.7b"
+BASE_MODEL = "facebook/opt-125m"
+# BASE_MODEL = "facebook/opt-6.7b"
 MICRO_BATCH_SIZE = 4  # this could actually be 5 but i like powers of 2
 BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
 EPOCHS = 1  # we don't need 3 tbh
 LEARNING_RATE = 3e-4  # the Karpathy constant
-CUTOFF_LEN = 512 
+CUTOFF_LEN = 512
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
-DATA_PATH = "alpaca_data.json"
+# DATA_PATH = "alpaca_data.json"
+DATA_PATH = "alpaca_data_small.json"
+ENABLE_16BIT = True
 
 ## TODO: Download alpaca_data.json here
 
-model = OPTForCausalLM.from_pretrained(
-    BASE_MODEL,
-    load_in_8bit=True,
-    device_map="auto",
-)
-model = prepare_model_for_int8_training(model)
+if torch.cuda.is_available():
+    model = OPTForCausalLM.from_pretrained(
+        BASE_MODEL,
+        load_in_8bit=True,
+        device_map="auto",
+    )
+    model = prepare_model_for_int8_training(model)
+else:
+    model = OPTForCausalLM.from_pretrained(
+        BASE_MODEL,
+    )
+    ENABLE_16BIT = False
 
 tokenizer = AutoTokenizer.from_pretrained(
     BASE_MODEL,
@@ -87,7 +96,7 @@ trainer = transformers.Trainer(
         warmup_steps=100,
         num_train_epochs=EPOCHS,
         learning_rate=LEARNING_RATE,
-        fp16=True,
+        fp16=ENABLE_16BIT,
         logging_steps=1,
         output_dir="alpaca-opt-6.7b",
         save_total_limit=3,

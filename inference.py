@@ -1,20 +1,29 @@
 import torch
 from peft import PeftModel
-from transformers import AutoTokenizer, OPTForCausalLM, GenerationConfig
+from transformers import AutoTokenizer, OPTForCausalLM
 
-MODEL_NAME = "facebook/opt-6.7b"
+# MODEL_NAME = "facebook/opt-6.7b"
+MODEL_NAME = "facebook/opt-125m"
+
+if torch.cuda.is_available():
+    model = OPTForCausalLM.from_pretrained(
+        MODEL_NAME,
+        load_in_8bit=True,
+        torch_dtype=torch.float16,
+        device_map="auto",
+    )
+    model = PeftModel.from_pretrained(
+        model, "alpaca-opt-6.7b", torch_dtype=torch.float16
+    )
+    device = torch.cuda.get_device_name()
+else:
+    model = OPTForCausalLM.from_pretrained(
+        MODEL_NAME,
+    )
+    model = PeftModel.from_pretrained(model, "alpaca-opt-6.7b")
+    device = "cpu"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
-model = OPTForCausalLM.from_pretrained(
-    MODEL_NAME,
-    load_in_8bit=True,
-    torch_dtype=torch.float16,
-    device_map="auto",
-)
-model = PeftModel.from_pretrained(
-    model, "alpaca-opt-6.7b", torch_dtype=torch.float16
-)
 
 
 def generate_prompt(instruction, input=None):
@@ -43,18 +52,18 @@ model.eval()
 def evaluate(instruction, input=None):
     prompt = generate_prompt(instruction, input)
     inputs = tokenizer(prompt, return_tensors="pt")
-    input_ids = inputs["input_ids"].cuda()
+    input_ids = inputs["input_ids"].to(device)
     generation_output = model.generate(
         input_ids=input_ids,
         return_dict_in_generate=True,
         output_scores=True,
         do_sample=False,
-        max_length= 256,
-        temperature= 0.7,
+        max_length=256,
+        temperature=0.7,
         length_penalty=-0.5,
-        top_k= 30,
-        top_p= 0.85,
-        repetition_penalty=1.5
+        top_k=30,
+        top_p=0.85,
+        repetition_penalty=1.5,
     )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)

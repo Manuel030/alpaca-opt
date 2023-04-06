@@ -2,8 +2,8 @@ import torch
 from peft import PeftModel
 from transformers import AutoTokenizer, OPTForCausalLM
 
-# MODEL_NAME = "facebook/opt-6.7b"
-MODEL_NAME = "facebook/opt-125m"
+MODEL_NAME = "facebook/opt-6.7b"
+# MODEL_NAME = "facebook/opt-125m"
 
 if torch.cuda.is_available():
     model = OPTForCausalLM.from_pretrained(
@@ -15,7 +15,7 @@ if torch.cuda.is_available():
     model = PeftModel.from_pretrained(
         model, "alpaca-opt-6.7b", torch_dtype=torch.float16
     )
-    device = torch.cuda.get_device_name()
+    device = "cuda"
 else:
     model = OPTForCausalLM.from_pretrained(
         MODEL_NAME,
@@ -57,16 +57,15 @@ def evaluate(instruction, input=None):
         input_ids=input_ids,
         return_dict_in_generate=True,
         output_scores=True,
-        do_sample=False,
+        do_sample=True,
         max_length=256,
         temperature=0.7,
-        length_penalty=-0.5,
-        top_k=30,
-        top_p=0.85,
-        repetition_penalty=1.5,
+        top_k=50,
+        top_p=0.95,
+        eos_token_id=tokenizer.eos_token_id,
     )
     s = generation_output.sequences[0]
-    output = tokenizer.decode(s)
+    output = tokenizer.decode(s, skip)
     return output.split("### Response:")[1].strip()
 
 

@@ -1,7 +1,7 @@
 from peft import PeftModel
 from transformers import OPTForCausalLM
 
-BASE_MODEL = "facebook/opt-125m"
+BASE_MODEL = "facebook/opt-6.7b"
 
 base_model = OPTForCausalLM.from_pretrained(
     BASE_MODEL,

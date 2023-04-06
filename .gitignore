@@ -1,6 +1,7 @@
 alpaca-opt/
 alpaca-opt-125m/
 alpaca-opt-6.7b/
+hf_ckpt/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

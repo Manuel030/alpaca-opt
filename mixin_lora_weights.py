@@ -21,3 +21,8 @@ deloreanized_sd = {
 OPTForCausalLM.save_pretrained(
     base_model, "./hf_ckpt", state_dict=deloreanized_sd, max_shard_size="400MB"
 )
+
+# now load as usual
+mixin_model = OPTForCausalLM.from_pretrained(
+    "./hf_ckpt",
+).push_to_hub("alpaca-opt-6.7b")

@@ -11,17 +11,17 @@ from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
 BASE_MODEL = "facebook/opt-125m"
 # BASE_MODEL = "facebook/opt-6.7b"
-MICRO_BATCH_SIZE = 4  # this could actually be 5 but i like powers of 2
+MICRO_BATCH_SIZE = 4
 BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
-EPOCHS = 1  # we don't need 3 tbh
-LEARNING_RATE = 3e-4  # the Karpathy constant
+EPOCHS = 1  
+LEARNING_RATE = 3e-4 
 CUTOFF_LEN = 512
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
-# DATA_PATH = "alpaca_data.json"
-DATA_PATH = "alpaca_data_small.json"
+DATA_PATH = "alpaca_data.json"
+# DATA_PATH = "alpaca_data_small.json"
 ENABLE_16BIT = True
 
 ## TODO: Download alpaca_data.json here

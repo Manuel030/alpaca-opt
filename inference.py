@@ -27,23 +27,16 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 
 def generate_prompt(instruction, input=None):
+    base_prompt = "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n" + instruction
+
     if input:
-        return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Input:
-{input}
-
-### Response:"""
+        input_section = "\n\n### Input:\n" + input
     else:
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+        input_section = ""
 
-### Instruction:
-{instruction}
+    response_section = "\n\n### Response:"
 
-### Response:"""
+    return base_prompt + input_section + response_section
 
 
 model.eval()
@@ -65,12 +58,11 @@ def evaluate(instruction, input=None):
         eos_token_id=tokenizer.eos_token_id,
     )
     s = generation_output.sequences[0]
-    output = tokenizer.decode(s, skip)
+    output = tokenizer.decode(s)
     return output.split("### Response:")[1].strip()
 
 
 if __name__ == "__main__":
-    # testing code for readme
     for instruction in [
         "Tell me about alpacas.",
         "Tell me about the president of Mexico in 2019.",

@@ -1,11 +1,12 @@
 from peft import PeftModel
-from transformers import OPTForCausalLM
+from transformers import OPTForCausalLM, AutoTokenizer
 
 BASE_MODEL = "facebook/opt-6.7b"
 
 base_model = OPTForCausalLM.from_pretrained(
     BASE_MODEL,
 )
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 
 lora_model = PeftModel.from_pretrained(base_model, "alpaca-opt-6.7b")
 
@@ -26,3 +27,4 @@ OPTForCausalLM.save_pretrained(
 mixin_model = OPTForCausalLM.from_pretrained(
     "./hf_ckpt",
 ).push_to_hub("alpaca-opt-6.7b")
+tokenizer.push_to_hub("alpaca-opt-6.7b")

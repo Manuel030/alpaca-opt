@@ -28,5 +28,7 @@ Instruction: Tell me about the president of Mexico in 2019.
 Response: The president of Mexico in 2019 is Andres Manuel Lopez Obrador (AMLO), who took office on December 1, 2018. AMLO is a leftist politician and former mayor of Mexico City. He is known for his populist platform and his opposition to the country's political establishment. He has promised to bring about a more equal and just society and to address the problems of corruption and inequality. AMLO has also promised to address the country's problems of crime, violence, and poverty. He has also been critical of the United States' immigration policy and has pledged to protect the rights of migrants and asylum seekers. He has also promised to fight corruption and to reduce the country's dependence on foreign oil.
 ```
 
+Sucks at writing code though. 
+
 ### Credits
 - [tloen/alpaca-lora](https://github.com/tloen/alpaca-lora)

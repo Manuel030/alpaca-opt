@@ -4,7 +4,7 @@ Training and inference code for [OPT](https://ai.facebook.com/blog/democratizing
 from the huggingface hub:
 
 ```python
-from transfomers import OPTForCausalLM
+from transfomers import OPTForCausalLM, AutoTokenizer
 
 model = OPTForCausalLM.from_pretrained(
     "Manuel030/alpaca-opt-6.7b",
